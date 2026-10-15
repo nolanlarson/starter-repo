@@ -1,0 +1,27 @@
+[project]
+name = "starter-repo"
+version = "0.1.0"
+description = "A minimal template for Python AI agent pipeline repositories"
+requires-python = ">=3.10"
+dependencies = [
+    "claude-agent-sdk>=0.2.165",
+    "google-genai>=2.29.0",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+agent-server = "app.server:main"
+agent-console = "app.console:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
