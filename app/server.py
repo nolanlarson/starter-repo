@@ -3,11 +3,12 @@
 import argparse
 import asyncio
 import json
+import logging
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
 
-from app.agent import stream_agent_response
+from app.agent import MAX_PROMPT_CHARS, stream_agent_response
 
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
@@ -32,6 +33,12 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 raise ValueError("prompt must be a non-empty string")
         except (ValueError, json.JSONDecodeError) as error:
             self._send_json(400, {"error": str(error)})
+            return
+        if len(prompt) > MAX_PROMPT_CHARS:
+            self._send_json(
+                413,
+                {"error": f"prompt exceeds the {MAX_PROMPT_CHARS:,}-character limit"},
+            )
             return
 
         self.send_response(200)
@@ -69,6 +76,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
 
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     server = ThreadingHTTPServer((args.host, args.port), AgentRequestHandler)
     print(f"Agent server listening on http://{args.host}:{args.port}")
     try:
