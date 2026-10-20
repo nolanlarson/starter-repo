@@ -12,6 +12,8 @@ dependencies = [
 [project.scripts]
 agent-server = "app.server:main"
 agent-console = "app.console:main"
+agent-console-session = "app.console:main_session"
+agent-evals = "app.evals:main"
 
 [dependency-groups]
 dev = ["pytest>=8.0"]

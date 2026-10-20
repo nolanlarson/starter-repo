@@ -10,6 +10,7 @@ venv/
 # Editor
 .vscode/
 .DS_Store
+copilot_prompts/
 
 # Test / coverage
 .pytest_cache/

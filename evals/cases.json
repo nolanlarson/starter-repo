@@ -1,0 +1,12 @@
+[
+  {
+    "id": "arithmetic-smoke",
+    "prompt": "What is 2 + 2? Reply with only the number.",
+    "expected_contains": ["4"]
+  },
+  {
+    "id": "exact-phrase-smoke",
+    "prompt": "Reply with exactly this text: PIPELINE_EVAL_OK",
+    "expected_contains": ["PIPELINE_EVAL_OK"]
+  }
+]
