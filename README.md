@@ -183,3 +183,110 @@ uv add openai
 uv add --dev ruff
 uv sync --locked
 ```
+
+## Copilot and Development Workflows
+
+### Included project tooling
+
+- `.github/copilot-instructions.md` gives Copilot project-specific architecture,
+	test, privacy, and tool-boundary guidance.
+- `.github/prompts/review-agent-change.prompt.md` adds the `/review-agent-change`
+	prompt for reviewing the current diff without editing files.
+- `.vscode/extensions.json` recommends the Python, Pylance, Ruff, and GitHub
+	Actions extensions; these are recommendations, not required dependencies.
+- `.github/workflows/ci.yml` runs the offline test suite on Python 3.10 and
+	3.14 with the committed `uv.lock`.
+
+### Spec Kit (optional)
+
+[GitHub Spec Kit](https://github.com/github/spec-kit) is useful for substantial
+features that need explicit requirements, design decisions, and a reviewable
+implementation plan. It is usually unnecessary for small fixes or one-line
+changes. Spec Kit artifacts are project files: review and commit the ones the
+team wants to maintain.
+
+Spec Kit requires Python 3.11 or newer. Install its CLI and initialize this
+existing repository with the Copilot integration:
+
+```bash
+uv tool install specify-cli
+specify init --here --force --integration copilot
+```
+
+Before initialization, commit or stash current work and use a branch. `--force`
+allows initialization in a non-empty repository and may replace files at
+conflicting generated paths. Review its diff carefully, especially files under
+`.github/`, and merge generated instructions with this repository's existing
+Copilot guidance rather than discarding it.
+
+For a feature, use the generated Copilot skills in order as appropriate:
+
+```text
+/speckit.constitution
+/speckit.specify
+/speckit.clarify
+/speckit.plan
+/speckit.tasks
+/speckit.analyze
+/speckit.implement
+/speckit.converge
+```
+
+Create the constitution once from rules the team actually follows. For each
+feature, specify and clarify intent, plan and analyze the change, then implement
+and converge with the agent. Review each artifact before moving on. See the
+[existing-project guide](https://github.github.io/spec-kit/guides/existing-projects.html)
+and [Spec Kit documentation](https://github.github.io/spec-kit/).
+
+### Beads (optional)
+
+[Beads](https://github.com/gastownhall/beads) is a persistent issue tracker for
+work that spans sessions, has dependencies, or is shared across contributors or
+agents. For a short, self-contained task, the repository's tests and a simple
+prompt are usually enough.
+
+On macOS, install the CLI and initialize the issue database in this repository:
+
+```bash
+brew install beads
+bd init --skip-agents --skip-hooks
+bd ready
+```
+
+`--skip-agents` avoids generating competing instruction files, and
+`--skip-hooks` avoids installing Git hooks. Review the generated `.beads/`
+files and decide whether issue data should be committed and shared with the
+repository. See the [Beads installation guide](https://github.com/gastownhall/beads/blob/main/docs/getting-started/installation.md)
+for other platforms and storage/sync options.
+
+To let Copilot Chat operate on Beads issues from VS Code, install its MCP
+server and create `.vscode/mcp.json`:
+
+```bash
+uv tool install beads-mcp
+```
+
+```json
+{
+	"servers": {
+		"beads": {
+			"command": "beads-mcp",
+			"args": []
+		}
+	}
+}
+```
+
+This gives Copilot issue-tracking tools, including tools that create and update
+issues. Enable it only if you want that access in the workspace, then reload
+VS Code. See the [Beads Copilot integration guide](https://github.com/gastownhall/beads/blob/main/docs/integrations/github-copilot.md).
+
+### Using Spec Kit and Beads together
+
+They solve different problems and can be combined. Use Spec Kit for the feature
+contract and design record; after reviewing its plan, create Beads issues for
+work that needs durable ownership, dependencies, or cross-session tracking. Keep
+Beads as the source of truth for execution status, and keep the Spec Kit
+artifacts as the source of truth for requirements and design. Avoid maintaining
+two independently checked task lists; link the Beads IDs from the spec or plan
+if useful.

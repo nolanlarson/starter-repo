@@ -8,9 +8,9 @@ venv/
 .env
 
 # Editor
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .DS_Store
-copilot_prompts/
 
 # Test / coverage
 .pytest_cache/
@@ -21,3 +21,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+# scratch files
+scratch/
+copilot_prompts.txt
