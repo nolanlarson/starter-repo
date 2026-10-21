@@ -25,3 +25,9 @@ dist/
 # scratch files
 scratch/
 copilot_prompts.txt
+
+# Beads state/config is initialized independently in each clone.
+.beads/
+.dolt/
+*.db
+*.gate.lock*

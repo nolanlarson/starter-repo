@@ -219,6 +219,13 @@ conflicting generated paths. Review its diff carefully, especially files under
 `.github/`, and merge generated instructions with this repository's existing
 Copilot guidance rather than discarding it.
 
+Keep the shared `.specify/` scripts, templates, and manifests in version
+control. `.specify/.gitignore` excludes per-checkout state such as the active
+feature pointer and local integration packages. Commit feature artifacts under
+`.specify/features/` when you want the requirements and plan to be reviewable
+and shared with collaborators. Replace the placeholder constitution with
+principles the project actually adopts before relying on it.
+
 For a feature, use the generated Copilot skills in order as appropriate:
 
 ```text
@@ -245,7 +252,8 @@ work that spans sessions, has dependencies, or is shared across contributors or
 agents. For a short, self-contained task, the repository's tests and a simple
 prompt are usually enough.
 
-On macOS, install the CLI and initialize the issue database in this repository:
+On macOS, install the CLI and initialize a separate issue database in your
+clone:
 
 ```bash
 brew install beads
@@ -254,32 +262,55 @@ bd ready
 ```
 
 `--skip-agents` avoids generating competing instruction files, and
-`--skip-hooks` avoids installing Git hooks. Review the generated `.beads/`
-files and decide whether issue data should be committed and shared with the
-repository. See the [Beads installation guide](https://github.com/gastownhall/beads/blob/main/docs/getting-started/installation.md)
+`--skip-hooks` avoids installing Git hooks. The template ignores all of
+`.beads/`: it contains clone-specific metadata and may contain a database,
+backup, credential, or sync configuration. Do not commit it. Configure a Dolt
+remote explicitly only if you intend to share issue data. See the
+[Beads installation guide](https://github.com/gastownhall/beads/blob/main/docs/getting-started/installation.md)
 for other platforms and storage/sync options.
 
-To let Copilot Chat operate on Beads issues from VS Code, install its MCP
-server and create `.vscode/mcp.json`:
+To let Copilot Chat operate on Beads issues from VS Code, install its local MCP
+server:
 
 ```bash
 uv tool install beads-mcp
 ```
 
+For a personal setup across workspaces, use the Command Palette's **MCP: Add
+Server**, choose **Command (stdio)**, enter `beads-mcp`, and select the
+user/profile scope. For a team-shared workspace setup, add this to
+`.vscode/mcp.json` instead:
+
 ```json
 {
 	"servers": {
 		"beads": {
+			"type": "stdio",
 			"command": "beads-mcp",
-			"args": []
+			"args": [],
+			"env": {
+				"BEADS_REQUIRE_CONTEXT": "1",
+				"PYTHON_DOTENV_DISABLED": "true"
+			}
 		}
 	}
 }
 ```
 
-This gives Copilot issue-tracking tools, including tools that create and update
-issues. Enable it only if you want that access in the workspace, then reload
-VS Code. See the [Beads Copilot integration guide](https://github.com/gastownhall/beads/blob/main/docs/integrations/github-copilot.md).
+The Beads MCP adapter runs locally over stdio; its documented setup does not
+provide a hosted MCP URL. If VS Code cannot find `beads-mcp`, use the full path
+reported by `command -v beads-mcp`. Before any writes, select the project with
+the Beads `context` tool, for example:
+
+```text
+context(action="set", workspace_root="/path/to/your/clone")
+```
+
+Set `BEADS_REQUIRE_CONTEXT=1` in the server's `env` configuration, as in the
+workspace example, to enforce that writes fail until a workspace is selected.
+Beads tools can create, update, and close issues, so enable them only where you
+want that access. See the
+[Beads Copilot integration guide](https://github.com/gastownhall/beads/blob/main/docs/integrations/github-copilot.md).
 
 ### Using Spec Kit and Beads together
 
