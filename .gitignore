@@ -26,9 +26,8 @@ dist/
 scratch/
 copilot_prompts.txt
 
-# Beads / Dolt files (added by bd init)
+# Beads state/config is initialized independently in each clone.
+.beads/
 .dolt/
 *.db
-.beads-credential-key
-.beads/proxieddb/
 *.gate.lock*
